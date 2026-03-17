@@ -1,0 +1,173 @@
+[
+    {
+        "testName": "Test Case 1",
+        "input": {
+            "newBookPrice": "10",
+            "oldBookPrice": "",
+            "VIPCustomer": true,
+            "expectedPrice": "9"
+        }
+    },
+    {
+        "testName": "Test Case 2",
+        "input": {
+            "newBookPrice": "10",
+            "oldBookPrice": "",
+            "VIPCustomer": false,
+            "expectedPrice": "10"
+        }
+    },
+    {
+        "testName": "Test Case 3",
+        "input": {
+            "newBookPrice": "100",
+            "oldBookPrice": "",
+            "VIPCustomer": false,
+            "expectedPrice": "90"
+        }
+    },
+    {
+        "testName": "Test Case 4",
+        "input": {
+            "newBookPrice": "100",
+            "oldBookPrice": "",
+            "VIPCustomer": true,
+            "expectedPrice": "85"
+        }
+    },
+    {
+        "testName": "Test Case 5",
+        "input": {
+            "newBookPrice": "49.99",
+            "oldBookPrice": "",
+            "VIPCustomer": false,
+            "expectedPrice": "49.99"
+        }
+    },
+    {
+        "testName": "Test Case 6",
+        "input": {
+            "newBookPrice": "50",
+            "oldBookPrice": "",
+            "VIPCustomer": false,
+            "expectedPrice": "45"
+        }
+    },
+    {
+        "testName": "Test Case 7",
+        "input": {
+            "newBookPrice": "49.99",
+            "oldBookPrice": "",
+            "VIPCustomer": true,
+            "expectedPrice": "44.99"
+        }
+    },
+    {
+        "testName": "Test Case 8",
+        "input": {
+            "newBookPrice": "50",
+            "oldBookPrice": "",
+            "VIPCustomer": true,
+            "expectedPrice": "42.5"
+        }
+    },
+    {
+        "testName": "Test Case 9",
+        "input": {
+            "newBookPrice": "40",
+            "oldBookPrice": "60",
+            "VIPCustomer": false,
+            "expectedPrice": "100"
+        }
+    },
+    {
+        "testName": "Test Case 10",
+        "input": {
+            "newBookPrice": "40",
+            "oldBookPrice": "60.01",
+            "VIPCustomer": false,
+            "expectedPrice": "97.01"
+        }
+    },
+    {
+        "testName": "Test Case 11",
+        "input": {
+            "newBookPrice": "30",
+            "oldBookPrice": "60.01",
+            "VIPCustomer": false,
+            "expectedPrice": "90.01"
+        }
+    },
+    {
+        "testName": "Test Case 12",
+        "input": {
+            "newBookPrice": "30.01",
+            "oldBookPrice": "60.01",
+            "VIPCustomer": false,
+            "expectedPrice": "87.02"
+        }
+    },
+    {
+        "testName": "Test Case 13",
+        "input": {
+            "newBookPrice": "40",
+            "oldBookPrice": "61",
+            "VIPCustomer": true,
+            "expectedPrice": "93.95"
+        }
+    },
+    {
+        "testName": "Test Case 14",
+        "input": {
+            "newBookPrice": "100",
+            "oldBookPrice": "61",
+            "VIPCustomer": false,
+            "expectedPrice": "147.95"
+        }
+    },
+    {
+        "testName": "Test Case 15",
+        "input": {
+            "newBookPrice": "100",
+            "oldBookPrice": "61",
+            "VIPCustomer": true,
+            "expectedPrice": "142.95"
+        }
+    },
+    {
+        "testName": "Test Case 16",
+        "input": {
+            "newBookPrice": "",
+            "oldBookPrice": "60",
+            "VIPCustomer": false,
+            "expectedPrice": "60"
+        }
+    },
+    {
+        "testName": "Test Case 17",
+        "input": {
+            "newBookPrice": "",
+            "oldBookPrice": "60.01",
+            "VIPCustomer": true,
+            "expectedPrice": "60.01"
+        }
+    },
+    {
+        "testName": "Test Case 18",
+        "input": {
+            "newBookPrice": "0.01",
+            "oldBookPrice": "",
+            "VIPCustomer": false,
+            "expectedPrice": "0.01"
+        }
+    },
+    {
+        "testName": "Test Case 19",
+        "input": {
+            "newBookPrice": "40",
+            "oldBookPrice": "50",
+            "VIPCustomer": false,
+            "expectedPrice": "90"
+        }
+    }
+]

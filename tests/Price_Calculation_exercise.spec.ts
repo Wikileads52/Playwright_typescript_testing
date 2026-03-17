@@ -1,4 +1,4 @@
-import { test, expect, Page, BrowserContext, Locator } from "@playwright/test";
+import { test, expect, Page, BrowserContext } from "@playwright/test";
 import TestData from "../utils/testCard.json"
 
 
@@ -34,4 +34,4 @@ test.afterAll(async()=>{
     await page.getByRole("button", {name:"Show my result"}).click()
     console.log(await page.locator('[data-harmony-id="Missing test"]').allTextContents())
     console.log(await page.locator('[data-harmony-id="result"]').allTextContents())
-})
+});
