@@ -1,0 +1,137 @@
+[
+    {
+        "testName": "Test case 1",
+        "input":{
+            "Price": "100",
+            "Weight": "5",
+            "creditCard": false,
+            "expectedPrice": "105"
+        }
+    },
+    {
+        "testName": "Test case 2",
+        "input":{
+            "Price": "199",
+            "Weight": "10",
+            "creditCard": false,
+            "expectedPrice": "199"
+        }
+    },
+        {
+        "testName": "Test case 3",
+        "input":{
+            "Price": "200",
+            "Weight": "4.99",
+            "creditCard": false,
+            "expectedPrice": "180"
+        }
+    },
+        {
+        "testName": "Test case 4",
+        "input":{
+            "Price": "200",
+            "Weight": "5",
+            "creditCard": false,
+            "expectedPrice": "180"
+        }
+    },
+        {
+        "testName": "Test case 5",
+        "input":{
+            "Price": "200",
+            "Weight": "4.9",
+            "creditCard": true,
+            "expectedPrice": "170"
+        }
+    },
+        {
+        "testName": "Test case 6",
+        "input":{
+            "Price": "100",
+            "Weight": "6",
+            "creditCard": true,
+            "expectedPrice": "103"
+        }
+    },
+    {
+        "testName": "Test case 7",
+        "input":{
+            "Price": "5",
+            "Weight": "5",
+            "creditCard": false,
+            "expectedPrice": "10"
+        }
+    },
+    {
+        "testName": "Test case 8",
+        "input":{
+            "Price": "100",
+            "Weight": "4",
+            "creditCard": true,
+            "expectedPrice": "97"
+        }
+    },
+    {
+        "testName": "Test case 9",
+        "input":{
+            "Price": "200",
+            "Weight": "5",
+            "creditCard": true,
+            "expectedPrice": "174.6"
+        }
+    },
+    {
+        "testName": "Test case 10",
+        "input":{
+            "Price": "200",
+            "Weight": "6",
+            "creditCard": true,
+            "expectedPrice": "174.6"
+        }
+    },
+    {
+        "testName": "Test case 11",
+        "input":{
+            "Price": "199.9",
+            "Weight": "4.9",
+            "creditCard": true,
+            "expectedPrice": "193.9"
+        }
+    },
+    {
+        "testName": "Test case 12",
+        "input":{
+            "Price": "199.9",
+            "Weight": "4.9",
+            "creditCard": false,
+            "expectedPrice": "199.9"
+        }
+    },
+    {
+        "testName": "Test case 13",
+        "input":{
+            "Price": "300",
+            "Weight": "3",
+            "creditCard": true,
+            "expectedPrice": "255"
+        }
+    }, 
+    {
+        "testName": "Test case 14",
+        "input":{
+            "Price": "100.1",
+            "Weight": "6",
+            "creditCard": false,
+            "expectedPrice": "100.1"
+        }
+    },
+    {
+        "testName": "Test case 15",
+        "input":{
+            "Price": "210",
+            "Weight": "5.1",
+            "creditCard": false,
+            "expectedPrice": "189"
+        }
+    }
+]
