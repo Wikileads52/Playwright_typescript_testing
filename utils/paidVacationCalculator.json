@@ -1,0 +1,163 @@
+[
+    {
+        "testName": "Test Case 1",
+        "input": {
+            "age": "18",
+            "yearsOfService": "0",
+            "expectedDays": "22"
+        }
+    },
+    {
+        "testName": "Test case 2",
+        "input": {
+            "age": "17",
+            "yearsOfService": "1",
+            "expectedDays": "27"
+        }
+    },
+    {
+        "testName": "Test case 3",
+        "input": {
+            "age": "16",
+            "yearsOfService": "1",
+            "expectedDays": "27"
+        }
+    },
+    {
+        "testName": "Test case 4",
+        "input": {
+            "age": "18",
+            "yearsOfService": "15",
+            "expectedDays": "24"
+        }
+    },
+    {
+        "testName": "Test case 5",
+        "input": {
+            "age": "18",
+            "yearsOfService": "14",
+            "expectedDays": "22"
+        }
+    },
+    {
+        "testName": "Test case 6",
+        "input": {
+            "age": "60",
+            "yearsOfService": "29",
+            "expectedDays": "27"
+        }
+    },
+    {
+        "testName": "Test case 7",
+        "input": {
+            "age": "60",
+            "yearsOfService": "30",
+            "expectedDays": "30"
+        }
+    },
+    {
+        "testName": "Test case 8",
+        "input": {
+            "age": "60",
+            "yearsOfService": "31",
+            "expectedDays": "30"
+        }
+    },
+    {
+        "testName": "Test case 9",
+        "input": {
+            "age": "64",
+            "yearsOfService": "20",
+            "expectedDays": "27"
+        }
+    },
+    {
+        "testName": "Test case 10",
+        "input": {
+            "age": "59",
+            "yearsOfService": "30",
+            "expectedDays": "27"
+        }
+    },
+    {
+        "testName": "Test case 11",
+        "input": {
+            "age": "60",
+            "yearsOfService": "25",
+            "expectedDays": "27"
+        }
+    },
+    {
+        "testName": "Test case 12",
+        "input": {
+            "age": "59",
+            "yearsOfService": "27",
+            "expectedDays": "24"
+        }
+    },
+    {
+        "testName": "Test case 13",
+        "input": {
+            "age": "44",
+            "yearsOfService": "1",
+            "expectedDays": "22"
+        }
+    },
+    {
+        "testName": "Test case 14",
+        "input": {
+            "age": "44",
+            "yearsOfService": "15",
+            "expectedDays": "24"
+        }
+    },
+    {
+        "testName": "Test case 15",
+        "input": {
+            "age": "45",
+            "yearsOfService": "14",
+            "expectedDays": "24"
+        }
+    },
+    {
+        "testName": "Test case 16",
+        "input": {
+            "age": "55",
+            "yearsOfService": "29",
+            "expectedDays": "24"
+        }
+    },
+    {
+        "testName": "Test case 17",
+        "input": {
+            "age": "55",
+            "yearsOfService": "32",
+            "expectedDays": "27"
+        }
+    },
+    {
+        "testName": "Test case 18",
+        "input": {
+            "age": "50",
+            "yearsOfService": "10",
+            "expectedDays": "24"
+        }
+    },
+    {
+        "testName": "Test case 19",
+        "input": {
+            "age": "39",
+            "yearsOfService": "20",
+            "expectedDays": "24"
+        }
+    },
+    {
+        "testName": "Test case 20",
+        "input": {
+            "age": "62",
+            "yearsOfService": "30",
+            "expectedDays": "30"
+        }
+    }
+   
+]

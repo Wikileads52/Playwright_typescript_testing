@@ -1,0 +1,12 @@
+[
+    {
+        "testName" : "Test case 1",
+        "input": {
+            "BE":"50",
+            "LE":"50",
+            "WP":"50",
+            "result":"very good"
+        }
+    }
+
+]
