@@ -8,7 +8,7 @@ test.describe.configure({mode: "serial"});
 test.beforeAll(async({browser})=>{
     webContext = await browser.newContext();
     page = await webContext.newPage();
-    await page.goto("https://exercises.test-design.org/paid-vacation-days/");
+    await page.goto("https://exercises.test-design.org/university-grade/");
 });
 
 test.afterEach(async()=>{
@@ -31,7 +31,7 @@ testData.forEach(data => {
         await page.getByRole("spinbutton").nth(1).fill(data.input.LE);
         await page.getByRole("spinbutton").last().fill(data.input.WP);
         await page.getByRole("button", {name:"Calculate result"}).click({timeout: 5000});
-        const courseResult: string = await page.locator("[data-harmony-id='course result']").textContent();
+        const courseResult: string = await page.locator("[data-harmony-id='cours result']").textContent();
         await expect(courseResult).toBe(expectedGrade);
-});
+    });
 });

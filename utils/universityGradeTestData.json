@@ -1,12 +1,173 @@
 [
     {
-        "testName" : "Test case 1",
+        "testName": "Test Case 1",
         "input": {
-            "BE":"50",
-            "LE":"50",
-            "WP":"50",
-            "result":"very good"
+            "BE": "50",
+            "LE": "50",
+            "WP": "50",
+            "result": "very good"
+        }
+    },
+    {
+        "testName": "Test Case 2",
+        "input": {
+            "BE": "43",
+            "LE": "42",
+            "WP": "41",
+            "result": "very good"
+        }
+    },
+    {
+        "testName": "Test Case 3",
+        "input": {
+            "BE": "42",
+            "LE": "42",
+            "WP": "42",
+            "result": "very good"
+        }
+    },
+    {
+        "testName": "Test Case 4",
+        "input": {
+            "BE": "35",
+            "LE": "33",
+            "WP": "33",
+            "result": "good"
+        }
+    },
+    {
+        "testName": "Test Case 5",
+        "input": {
+            "BE": "26",
+            "LE": "25",
+            "WP": "25",
+            "result": "satisfactory"
+        }
+    },
+    {
+        "testName": "Test Case 6",
+        "input": {
+            "BE": "34",
+            "LE": "33",
+            "WP": "33",
+            "result": "satisfactory"
+        }
+    },
+    {
+        "testName": "Test Case 7",
+        "input": {
+            "BE": "25",
+            "LE": "25",
+            "WP": "25",
+            "result": "failed"
+        }
+    },
+    {
+        "testName": "Test Case 8",
+        "input": {
+            "BE": "24",
+            "LE": "26",
+            "WP": "26",
+            "result": "failed"
+        }
+    },
+    {
+        "testName": "Test Case 9",
+        "input": {
+            "BE": "26",
+            "LE": "24",
+            "WP": "26",
+            "result": "failed"
+        }
+    },
+    {
+        "testName": "Test Case 10",
+        "input": {
+            "BE": "26",
+            "LE": "26",
+            "WP": "24",
+            "result": "failed"
+        }
+    },
+    {
+        "testName": "Test Case 11",
+        "input": {
+            "BE": "0",
+            "LE": "0",
+            "WP": "0",
+            "result": "failed"
+        }
+    },
+    {
+        "testName": "Test Case 12",
+        "input": {
+            "BE": "50",
+            "LE": "50",
+            "WP": "26",
+            "result": "very good"
+        }
+    },
+    {
+        "testName": "Test Case 13",
+        "input": {
+            "BE": "26",
+            "LE": "25",
+            "WP": "25",
+            "result": "satisfactory"
+        }
+    },
+    {
+        "testName": "Test Case 14",
+        "input": {
+            "BE": "42",
+            "LE": "42",
+            "WP": "41",
+            "result": "good"
+        }
+    },
+    {
+        "testName": "Test Case 15",
+        "input": {
+            "BE": "35",
+            "LE": "34",
+            "WP": "32",
+            "result": "good"
+        }
+    },
+    {
+        "testName": "Test Case 16",
+        "input": {
+            "BE": "50",
+            "LE": "50",
+            "WP": "20",
+            "result": "failed"
+        }
+    },
+    {
+        "testName": "Test Case 17",
+        "input": {
+            "BE": "50",
+            "LE": "20",
+            "WP": "50",
+            "result": "failed"
+        }
+    },
+    {
+        "testName": "Test Case 18",
+        "input": {
+            "BE": "20",
+            "LE": "50",
+            "WP": "50",
+            "result": "failed"
+        }
+    },
+    {
+        "testName": "Test Case 19",
+        "input": {
+            "BE": "25",
+            "LE": "26",
+            "WP": "26",
+            "result": "satisfactory"
         }
     }
-
 ]
