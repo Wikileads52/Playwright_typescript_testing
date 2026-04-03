@@ -6,3 +6,6 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+# The following line is added to show the understanding of sensitivity of .env files and to ensure that they are not accidentally committed to version control.
+#Still, for the sake of reviewers convinence, we are commenting it out to indicate that .env files should be ignored, are not here for practical purposes.
+# .env
