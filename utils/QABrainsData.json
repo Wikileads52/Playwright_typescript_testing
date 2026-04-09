@@ -1,0 +1,21 @@
+[
+    {
+        "productName": "Sample Shoe Name",
+        "productPrice": "$89.00",
+        "productDescription": "A sample description for the product.",
+        "numberOfProdcucts": 5
+    },
+    {
+        "productName": "Sample Trouser Name",
+        "productPrice": "$72.00",
+        "productDescription": "A sample description for the product.",
+        "numberOfProdcucts" : 1
+    },
+    {
+        "productName": "Sample Shirt Name",
+        "productPrice": "$49.99",
+        "productDescription": "A sample description for the product.",
+        "numberOfProdcucts": 3
+    }
+
+]

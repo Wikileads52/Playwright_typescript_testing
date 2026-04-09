@@ -11,12 +11,12 @@ export class POManager{
     CartPage : cartPage;
     CheckoutPage : checkoutPage;
 
-    constructor(page: Page, productName :string){
+    constructor(page : Page){
         this.page = page;
         this.LoginPage = new loginPage(this.page);
-        this.ShopPage = new shopPage(this.page, productName);
-        this.CartPage = new cartPage(this.page, productName);
-        this.CheckoutPage = new checkoutPage(this.page, productName);
+        this.ShopPage = new shopPage(this.page);
+        this.CartPage = new cartPage(this.page);
+        this.CheckoutPage = new checkoutPage(this.page);
     }
     getLoginPage(){
         return this.LoginPage;

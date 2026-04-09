@@ -9,19 +9,26 @@ export class cartPage{
     continueShoppingButton : Locator;
     checkoutButton : Locator;
     checkoutInformationBoard : Locator;
+    plusOneButton : Locator;
+    minusOneButton : Locator;
 
 
-    constructor(page: Page, productName : string){
-        this.page = page
-        this.cartProductName = this.page.getByRole("heading", {name: `${productName}`});
-        this.cartProductLine = this.page.locator(".cart-list").locator(".flex").filter({hasText:`${productName}`}).first()
-        this.removeButton = this.cartProductLine.getByRole("button", {name: "Remove"});
+    constructor(page: Page){
+        this.page = page;
         this.yourCartIsEmptyMessage = this.page.getByText("Your cart is empty.");
-        //this.removeButton = this.cartProductName.locator("..").getByRole("button", {name: "Remove"});
         this.continueShoppingButton = this.page.getByRole("button", {name: "Continue Shopping"});
         this.checkoutButton = this.page.getByRole("button", {name: "Checkout"});
         this.checkoutInformationBoard = this.page.locator("#checkout-info");
     };
+
+    setProductName(productName : string){
+        this.cartProductName = this.page.getByRole("heading", {name: `${productName}`});
+        this.cartProductLine = this.page.locator(".cart-list").locator(".flex").filter({hasText:`${productName}`}).first()
+        this.removeButton = this.cartProductLine.getByRole("button", {name: "Remove"});
+        this.plusOneButton = this.cartProductLine.getByRole("button", {name : "+", exact : true});
+        this.minusOneButton = this.cartProductLine.getByRole("button", {name : "-", exact: true});
+    }
+
 
     async goToCheckout(){
         await this.checkoutButton.click();
@@ -29,7 +36,8 @@ export class cartPage{
     };
 
 
-    async removeProduct(){
+    async removeProduct(productName){
+        this.setProductName(productName)
         const dialog = this.page.getByRole("dialog");
         await this.removeButton.click();
         await expect (dialog.getByRole("heading")).toHaveText("Are you absolutely sure?");
