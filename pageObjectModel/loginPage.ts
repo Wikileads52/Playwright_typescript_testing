@@ -19,7 +19,7 @@ export class loginPage{
         await this.page.goto(`${BASEURL}/login`);
     };
 
-    async firstUserLogin(email, password)
+    async userLogin(email, password)
     {
         await this.emailField.fill(email);
         await this.passwordField.fill(password);

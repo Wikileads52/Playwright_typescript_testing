@@ -96,5 +96,12 @@ export class shopPage{
     async setOrderLowToHigh(){
         await this.searchComboBox.click();
         await this.orderByLowToHigh.click();
-    }
+    };
+    
+    async setOrderHighToLow(){
+        await this.searchComboBox.click();
+        await this.orderByHighToLow.click();
+    };
+
+
 };

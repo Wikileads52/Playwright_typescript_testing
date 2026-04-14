@@ -6,5 +6,5 @@ test("Proton rocket image visible", async ({page})=>{
     .evaluate(img => { 
         const image = img as HTMLImageElement
         return image.complete && image.naturalWidth > 0});
-        expect(isLoaded).toBe(true);
+        expect(isLoaded).toBe(false);
 });

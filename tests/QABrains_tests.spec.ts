@@ -1,8 +1,8 @@
 import { test, expect, request } from "@playwright/test";
 import { POManager} from "../pageObjectModel/POManager";
 import data from "../utils/QABrainsData.json";
-import { shopPage } from "../pageObjectModel/shopPage";
-import { env } from "node:process";
+//tests are run in succession to keep issues of tests interference
+test.describe.configure({mode: "serial"});
 
 test("first user E2E test", async ({ page }) => {
     const productName: string | string[] = data[1].productName;
@@ -12,7 +12,7 @@ test("first user E2E test", async ({ page }) => {
     const CartPage = poManager.getCartPage();
     const CheckoutPage = poManager.getCheckoutPage();
     await LoginPage.goToShop(process.env.QABrains_BASEURL);
-    await LoginPage.firstUserLogin(process.env.QABrains_email, process.env.QABrains_password);
+    await LoginPage.userLogin(process.env.QABrains_email, process.env.QABrains_password);
     await ShopPage.getProductInCart(productName);
     await expect(ShopPage.toastStatus).toBeVisible();
     await expect(ShopPage.toastStatus).toContainText("Added to cart");
@@ -42,7 +42,7 @@ test("Remove the only product from the cart show empty message", async ({page}) 
     const ShopPage = poManager.getShopPage();
     const CartPage = poManager.getCartPage();
     await LoginPage.goToShop(process.env.QABrains_BASEURL);
-    await LoginPage.firstUserLogin(process.env.QABrains_email, process.env.QABrains_password);
+    await LoginPage.userLogin(process.env.QABrains_email, process.env.QABrains_password);
     await ShopPage.setProductName(productName);
     await ShopPage.getProductInCart(productName);
     await expect(ShopPage.toastStatus).toBeVisible();
@@ -65,7 +65,7 @@ test("Favorite page functions", async ({page}) =>{
     const LoginPage = poManager.getLoginPage();
     const ShopPage = poManager.getShopPage();
     await LoginPage.goToShop(process.env.QABrains_BASEURL);
-    await LoginPage.firstUserLogin(process.env.QABrains_email, process.env.QABrains_password);
+    await LoginPage.userLogin(process.env.QABrains_email, process.env.QABrains_password);
     await ShopPage.setProductAsFavorites(productName);
     await ShopPage.goToFavoritesPage();
     await expect(ShopPage.productCard).toBeVisible();
@@ -74,7 +74,7 @@ test("Favorite page functions", async ({page}) =>{
     await page.goto(`${process.env.QABrains_BASEURL}`);
     await ShopPage.goToFavoritesPage();
     await ShopPage.disconnectUser();
-    await LoginPage.firstUserLogin(process.env.QABrains_email, process.env.QABrains_password);
+    await LoginPage.userLogin(process.env.QABrains_email, process.env.QABrains_password);
     await ShopPage.goToFavoritesPage();
     await expect(ShopPage.productCard).toBeVisible();
     await ShopPage.removeFromFavorites(productName);
@@ -95,7 +95,7 @@ test("Add multiple products in the cart", async ({page})=>{
     const CartPage = poManager.getCartPage();
     const CheckoutPage = poManager.getCheckoutPage();
     await LoginPage.goToShop(process.env.QABrains_BASEURL);
-    await LoginPage.firstUserLogin(process.env.QABrains_email, process.env.QABrains_password);
+    await LoginPage.userLogin(process.env.QABrains_email, process.env.QABrains_password);
     await ShopPage.getProductInCart(productName1);
     await ShopPage.getProductInCart(productName2);
     await ShopPage.getProductInCart(productName3);
@@ -121,7 +121,7 @@ test("One product Multiple times in cart", async({page})=>{
     const CartPage = poManager.getCartPage();
     const CheckoutPage = poManager.getCheckoutPage();
     await LoginPage.goToShop(process.env.QABrains_BASEURL);
-    await LoginPage.firstUserLogin(process.env.QABrains_email, process.env.QABrains_password);
+    await LoginPage.userLogin(process.env.QABrains_email, process.env.QABrains_password);
     await ShopPage.getProductInCart(data[0].productName);
     await ShopPage.goToCart();
     await CartPage.addProductMultiple(data[0].productName, data[0].numberOfProdcucts);
@@ -145,7 +145,7 @@ test("Delete product Multiple times in cart", async({page})=>{
     const CartPage = poManager.getCartPage();
     const CheckoutPage = poManager.getCheckoutPage();
     await LoginPage.goToShop(process.env.QABrains_BASEURL);
-    await LoginPage.firstUserLogin(process.env.QABrains_email, process.env.QABrains_password);
+    await LoginPage.userLogin(process.env.QABrains_email, process.env.QABrains_password);
     await ShopPage.getProductInCart(data[0].productName);
     await ShopPage.goToCart();
     await CartPage.addProductMultiple(data[0].productName, data[0].numberOfProdcucts);
@@ -167,15 +167,25 @@ test("Verify order in product page", async({page})=>{
     const LoginPage = poManager.getLoginPage();
     const ShopPage = poManager.getShopPage();
     await LoginPage.goToShop(process.env.QABrains_BASEURL);
-    await LoginPage.firstUserLogin(process.env.QABrains_email, process.env.QABrains_password);
+    await LoginPage.userLogin(process.env.QABrains_email, process.env.QABrains_password);
     await ShopPage.setOrderLowToHigh();
-    await page.waitForLoadState("networkidle");
+    //await page.waitForLoadState("networkidle");
     await expect(page.getByText(/^\$\d+(\.\d{2})?$/).first()).toHaveText("$45.00");
-    const numberofdollarsigns = await page.getByText(/^\$\d+(\.\d{2})?$/).count();
+    let numberofdollarsigns = await page.getByText(/^\$\d+(\.\d{2})?$/).count();
     for(let i = 0 ; i < numberofdollarsigns ; i++){
         listprices.push(Number((await page.getByText(/^\$\d+(\.\d{2})?$/).nth(i).textContent()).replace("$", "").trim()));
     };
     for(let i = 0 ; i < listprices.length - 1 ; i++){
         expect(listprices[i]).toBeLessThanOrEqual(listprices[i+1]);
+    };
+    listprices=[];
+    await ShopPage.setOrderHighToLow();
+    await expect(page.getByText(/^\$\d+(\.\d{2})?$/).first()).toHaveText("$256.45");
+    numberofdollarsigns = await page.getByText(/^\$\d+(\.\d{2})?$/).count();
+    for(let i = 0 ; i < numberofdollarsigns ; i++){
+        listprices.push(Number((await page.getByText(/^\$\d+(\.\d{2})?$/).nth(i).textContent()).replace("$", "").trim()));
+    };
+    for(let i = 0 ; i < listprices.length -1 ; i++){
+        expect(listprices[i]).toBeGreaterThanOrEqual(listprices[i+1]);
     };
 });
