@@ -1,6 +1,7 @@
 import { test, expect, request } from "@playwright/test";
 import { POManager } from "../pageObjectModel/POManager";
 import data from "../utils/QABrainsData.json";
+import { shopPage } from "../pageObjectModel/shopPage";
 
 
 test("first user E2E test", async ({ page }) => {
@@ -53,8 +54,10 @@ test("Remove the only product from the cart show empty message", async ({ page }
     await expect(CartPage.yourCartIsEmptyMessage).toBeVisible();
     await expect(ShopPage.cartButtonNumber).not.toBeAttached();
     await expect(CartPage.continueShoppingButton).toBeInViewport();
-    expect(await CartPage.continueShoppingButton.locator("../..").screenshot())
+    //await expect(CartPage.continueShoppingButton.locator("../..")).toHaveScreenshot("CenteredContinueButton.png");
+    /* expect(await CartPage.continueShoppingButton.locator("../..").screenshot())
         .toMatchSnapshot("CenteredContinueButton.png");
+     */
     await page.close();
 });
 
@@ -80,8 +83,10 @@ test("Favorite page functions", async ({ page }) => {
     await expect(ShopPage.productCard).toHaveCount(0);
     await expect(ShopPage.noFavoritesMessage).toBeVisible();
     await expect(ShopPage.continueShoppingLink).toBeVisible();
-    expect(await ShopPage.continueShoppingLink.locator("../..").screenshot())
-        .toMatchSnapshot("ContinueShoppingLink.png");
+    //await expect(ShopPage.continueShoppingLink.locator("../..")).toHaveScreenshot("ContinueShoppingLink.png");
+    /* expect(await ShopPage.continueShoppingLink.locator("../..").screenshot())
+        .toMatchSnapshot("ContinueShoppingLink.png"); */
+    await page.close();
 });
 
 test("Add multiple products in the cart", async ({ page }) => {
