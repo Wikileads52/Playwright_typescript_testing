@@ -1,8 +1,7 @@
 import { test, expect, request } from "@playwright/test";
 import { POManager} from "../pageObjectModel/POManager";
 import data from "../utils/QABrainsData.json";
-//tests are run in succession to keep issues of tests interference
-test.describe.configure({mode: "serial"});
+
 
 test("first user E2E test", async ({ page }) => {
     const productName: string | string[] = data[1].productName;
@@ -54,7 +53,7 @@ test("Remove the only product from the cart show empty message", async ({page}) 
     await expect(CartPage.yourCartIsEmptyMessage).toBeVisible();
     await expect(ShopPage.cartButtonNumber).not.toBeAttached();
     await expect(CartPage.continueShoppingButton).toBeInViewport();
-    expect(await CartPage.continueShoppingButton.locator("../..").screenshot())
+    expect(await CartPage.continueShoppingButton.locator("..").screenshot())
     .toMatchSnapshot("CenteredContinueButton.png");
     await page.close();
 });
