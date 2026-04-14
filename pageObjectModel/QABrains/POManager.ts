@@ -1,8 +1,8 @@
 import { Page } from "@playwright/test"
-import { loginPage } from "../pageObjectModel/loginPage";
-import { shopPage } from "../pageObjectModel/shopPage";
-import { cartPage } from "../pageObjectModel/cartPage";
-import { checkoutPage } from "../pageObjectModel/checkoutPage"
+import { loginPage } from "./loginPage";
+import { shopPage } from "./shopPage";
+import { cartPage } from "./cartPage";
+import { checkoutPage } from "./checkoutPage"
 
 export class POManager{
     page : Page;

@@ -1,5 +1,5 @@
 import { test, expect, Page, BrowserContext } from "@playwright/test";
-import testData from "../utils/universityGradeTestData.json"
+import testData from "../../utils/exercises.test-design_TestData/universityGradeTestData.json"
 
 let webContext: BrowserContext;
 let page : Page;

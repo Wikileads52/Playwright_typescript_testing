@@ -1,7 +1,6 @@
-import { test, expect, request } from "@playwright/test";
-import { POManager } from "../pageObjectModel/POManager";
-import data from "../utils/QABrainsData.json";
-import { shopPage } from "../pageObjectModel/shopPage";
+import { test, expect } from "@playwright/test";
+import { POManager } from "../../pageObjectModel/QABrains/POManager";
+import data from "../../utils/QABrainsData.json";
 
 
 test("first user E2E test", async ({ page }) => {
@@ -55,9 +54,6 @@ test("Remove the only product from the cart show empty message", async ({ page }
     await expect(ShopPage.cartButtonNumber).not.toBeAttached();
     await expect(CartPage.continueShoppingButton).toBeInViewport();
     //await expect(CartPage.continueShoppingButton.locator("../..")).toHaveScreenshot("CenteredContinueButton.png");
-    /* expect(await CartPage.continueShoppingButton.locator("../..").screenshot())
-        .toMatchSnapshot("CenteredContinueButton.png");
-     */
     await page.close();
 });
 
