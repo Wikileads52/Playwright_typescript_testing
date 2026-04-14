@@ -11,6 +11,9 @@ jobs:
 
     env:
       DEBUG: pw:api
+      QABRAINS_BASEURL: https://practice.qabrains.com/ecommerce/
+      QABRAINS_email: test@qabrains.com
+      QABRAINS_password: Password123
 
     steps:
       - name: Checkout repository

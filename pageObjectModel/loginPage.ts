@@ -15,8 +15,8 @@ export class loginPage{
         this.loginButton = this.page.getByRole("button", {name: "Login"});
     };
 
-    async goToShop(BASEURL){
-        await this.page.goto(`${BASEURL}/login`);
+    async goToShop(){
+        await this.page.goto(`${process.env.QABRAINS_BASEURL}/login`);
     };
 
     async userLogin(email, password)
