@@ -1,21 +1,9 @@
-import { test, Request, expect, BrowserContext, Page } from "@playwright/test";
+import { test, expect, BrowserContext, Page } from "@playwright/test";
+import { POManager } from "../../pageObjectModel/AutomationExercisePOM/POManager";
 import {faker} from "@faker-js/faker";
 
 let webContext : BrowserContext;
 let page : Page;
-
-//Dismiss the continue shopping button in the product page
-const dismissModalProductInCart = async ()=>{
-    try{
-        const button = page.getByRole("button", { name: "Continue Shopping" });
-        await button.waitFor({ state: 'visible', timeout:3000 });
-        await button.click();
-    }
-    catch(error)
-    {
-        console.log("The modal did not appear")
-    };
-};
 
 test.beforeEach(async({browser})=>{
     webContext = await browser.newContext();
@@ -32,542 +20,397 @@ test.beforeEach(async({browser})=>{
     await expect(page.locator("#footer")).toBeVisible();
 });
 
-test("Register user and delete user", async () =>{
-    const fakeEmail = faker.internet.exampleEmail({allowSpecialCharacters: true });
-    console.log(fakeEmail);
-    await page.getByRole("link", {name : " Signup / Login"}).click();
-    await expect(page.getByRole("heading", {name : "New User Signup!"})).toBeVisible();
-    const SignupForm = page.locator(".signup-form");
-    await SignupForm.getByPlaceholder("Name").fill("John Doe");
-    await SignupForm.getByPlaceholder("Email Address").fill(fakeEmail);
-    await SignupForm.getByRole("button", {name : "Signup"}).click();
-    await expect(page).toHaveURL("https://www.automationexercise.com/signup");
-    await expect(page.getByText("Enter Account Information")).toBeVisible();
-    await page.getByRole("radio", {name : " Mr. "}).click();
-    await page.getByRole("textbox", {name : "password"}).fill("Password123");
-    await page.locator("#days").selectOption({value : "4"});
-    await page.locator("#months").selectOption({value : "2"});
-    await page.locator("#years").selectOption({value : "2000"});
-    await page.getByRole("checkbox", {name : "Sign up for our newsletter!"});
-    await page.getByLabel("First name ").fill("John");
-    await page.getByLabel("Last name ").fill("Doe");
-    await page.getByLabel("Company").first().fill("Google");
-    await page.getByRole("textbox", {name : "Address * (Street address, P."}).fill("Google");
-    await page.getByRole("combobox", {name : "Country"}).selectOption({value : "Canada"});
-    await page.getByRole("textbox", {name : "State"}).fill("Quebec");
-    await page.getByRole("textbox", {name : "City"}).fill("Montreal");
-    await page.locator('#zipcode').fill("213456");
-    await page.getByRole("textbox", {name : "Mobile Number"}).fill("0123456789");
-    await page.getByRole("button", {name : "Create Account"}).click();
-    await expect(page.getByText("Account created!")).toBeVisible();
-    await page.getByRole("link", {name : "Continue"}).click();
-    await expect(page.getByText("Logged in as")).toHaveText(/Logged in as \w+/);
-    await page.getByRole("link", {name : " Delete Account"}).click();
-    await expect(page.getByText("Account Deleted!")).toBeVisible();
-    await page.getByRole("link", {name : "Continue"}).click();
-    await page.close();
+test("@AutomationExercise Register user and delete user", async () =>{
+  const fakeEmail = faker.internet.exampleEmail({allowSpecialCharacters: true });
+  const fakeName = faker.person.fullName();
+  console.log(fakeEmail, fakeName);
+  const poManager = new POManager(page);
+  const BasePage = poManager.getBasePage();
+  const LoginPage = poManager.getLoginPage();
+  const registrationPage = poManager.getRegistrationPage();
+  await BasePage.goToSignUpPage();
+  await expect(LoginPage.userSignupHeading).toBeVisible();
+  await LoginPage.beginUserRegistration(fakeName, fakeEmail);
+  await expect(page).toHaveURL("https://www.automationexercise.com/signup");
+  await expect(registrationPage.registrationPageTitle).toBeVisible();
+  await registrationPage.registerationNewUser();
+  await expect(registrationPage.creationValidationText).toBeVisible();
+  await registrationPage.continueLinkLocator.click();
+  await expect(BasePage.loggedAsLocator).toHaveText(/Logged in as \w+/);
+  await BasePage.deleteUser();
+  await page.close();
 });
 
-test("Login with correct credentials", async ()=>{
-    await page.getByRole("link", {name : " Signup / Login"}).click();
-    await expect(page.getByRole("heading", {name : "Login to your account"})).toBeVisible();
-    const loginFormLocator = page.locator(".login-form");
-    await loginFormLocator.getByPlaceholder("Email Address").fill(`${process.env.AUTOMATIONEXERCISE_email}`);
-    await loginFormLocator.getByPlaceholder("Password").fill(`${process.env.AUTOMATIONEXERCISE_password}`);
-    await loginFormLocator.getByRole("button", {name : "Login"}).click();
-    await expect(page.getByText("Logged in as")).toHaveText(/Logged in as \w+/);
-    await expect(page.getByRole("link", {name : "Logout"})).toBeVisible();
-    await page.getByRole("link", {name : "Logout"}).click();
-    await expect(page.getByRole("link", {name :" Signup / Login"})).toBeVisible();
-    await page.close();
+test("@AutomationExercise Login with correct credentials", async ()=>{
+  const poManager = new POManager(page);
+  const BasePage = poManager.getBasePage();
+  const LoginPage = poManager.getLoginPage();
+  await BasePage.goToSignUpPage();
+  await expect(page.getByRole("heading", {name : "Login to your account"})).toBeVisible();
+  await LoginPage.userLogin(process.env.AUTOMATIONEXERCISE_email, process.env.AUTOMATIONEXERCISE_password);
+  await expect(BasePage.loggedAsLocator).toHaveText(/Logged in as \w+/);
+  await expect(BasePage.logoutButton).toBeVisible();
+  await BasePage.logoutUser();
+  await expect(BasePage.signupLoginButton).toBeVisible();
+  await page.close();
 });
 
-test("Login with incorrect credentials", async ()=>{
-    await page.getByRole("link", {name : " Signup / Login"}).click();
-    await expect(page.getByRole("heading", {name : "Login to your account"})).toBeVisible();
-    const loginFormLocator = page.locator(".login-form");
-    await loginFormLocator.getByPlaceholder("Email Address").fill(`${process.env.AUTOMATIONEXERCISE_email}`);
-    await loginFormLocator.getByPlaceholder("Password").fill("&é'(-è(");
-    await loginFormLocator.getByRole("button", {name : "Login"}).click();
-    await expect(loginFormLocator.getByRole("paragraph")).toHaveText("Your email or password is incorrect!");
-    await page.close();
+test("@AutomationExercise Login with incorrect credentials", async ()=>{
+  const poManager = new POManager(page);
+  const BasePage = poManager.getBasePage();
+  const LoginPage = poManager.getLoginPage();
+  await BasePage.goToSignUpPage();
+  await expect(page.getByRole("heading", {name : "Login to your account"})).toBeVisible();
+  await LoginPage.userLogin(process.env.AUTOMATIONEXERCISE_email, "fdgdsd#sdf21§");
+  await expect(LoginPage.userLoginErrorMessage).toHaveText("Your email or password is incorrect!");
+  await page.close();
 });
 
-test("Try to register with preexisting email address", async ()=>{
-    await page.getByRole("link", {name : " Signup / Login"}).click();
-    await expect(page.getByRole("heading", {name : "New User Signup!"})).toBeVisible();
-    const SignupForm = page.locator(".signup-form");
-    await SignupForm.getByPlaceholder("Name").fill("John Doe");
-    await SignupForm.getByPlaceholder("Email Address").fill(`${process.env.AUTOMATIONEXERCISE_email}`);
-    await SignupForm.getByRole("button", {name : "Signup"}).click();
-    await expect(SignupForm.getByRole("paragraph")).toHaveText("Email Address already exist!");
-    await page.close();
+test("@AutomationExercise Try to register with preexisting email address", async ()=>{
+  const poManager = new POManager(page);
+  const BasePage = poManager.getBasePage();
+  const LoginPage = poManager.getLoginPage();
+  await BasePage.goToSignUpPage();
+  await expect(LoginPage.userSignupHeading).toBeVisible();
+  await LoginPage.beginUserRegistration(faker.person.fullName(), process.env.AUTOMATIONEXERCISE_email);
+  await expect(LoginPage.userSignupErrorMessage).toHaveText("Email Address already exist!");
+  await page.close();
 });
 
-test("Testing Contact Us form", async ()=>{
-    await page.getByRole("link", {name : " Contact us"}).click();
-    await expect(page.getByRole("heading", {name : " Contact us"})).toBeVisible();
-    const contactUsFormLocator = page.locator(".contact-form").nth(1);
-    await contactUsFormLocator.getByRole("textbox", { name: "Name" }).fill(`John Doe`);
-    await contactUsFormLocator.getByPlaceholder("Email").fill(`${process.env.AUTOMATIONEXERCISE_email}`);
-    await contactUsFormLocator.getByRole('textbox', { name: 'Subject' }).fill("testing");
-    await contactUsFormLocator.getByRole('textbox', { name: 'Your Message Here' }).fill("testing here and waiting");
-    await page.keyboard.press("ArrowDown", {delay : 2000});
-    page.on('dialog', async dialog => {
-        await expect(dialog.message()).toContain("Press OK to proceed!");
-        dialog.accept()
-    });
-    await page.getByRole('button', { name: 'Submit' }).click();
-    await expect(page.locator(".status")).toContainText("Success! Your details have been submitted successfully.");
-    await page.keyboard.press("ArrowDown", {delay : 1000});
-    await page.getByRole("link", {name : "Home"}).nth(1).click();
-    await expect(page).toHaveURL("https://www.automationexercise.com");
-    await page.close();
+test("@AutomationExercise Testing Contact Us form", async ()=>{
+  const poManager = new POManager(page);
+  const BasePage = poManager.getBasePage();
+  const ContactUsPage = poManager.getContactUsPage();
+  await BasePage.goToContactUsPage();
+  await expect(ContactUsPage.contactUsPageTitle).toBeVisible();
+  await ContactUsPage.fillContactUsForm();
+  await expect(ContactUsPage.contactUsSuccessMessage).toContainText("Success! Your details have been submitted successfully.");
+  await page.keyboard.press("ArrowDown", {delay : 1000});
+  await BasePage.goToHome();
+  await expect(page).toHaveURL("https://www.automationexercise.com");
+  await page.close();
 });
 
-test("Verify test case page", async ()=>{
-    await page.getByRole("link", {name : "Test Cases"}).first().click();
-    await expect(page).toHaveURL("https://www.automationexercise.com/test_cases");
-    page.close()
+test("@AutomationExercise Verify test case page", async ()=>{
+  const poManager = new POManager(page);
+  const BasePage = poManager.getBasePage();
+  await BasePage.goToTestCasesPage()
+  await expect(page).toHaveURL("https://www.automationexercise.com/test_cases");
+  page.close()
 });
 
-test("Verify products page and product detail page", async()=>{
-    await page.getByRole("link", {name : " Products"}).click();
-    await expect(page).toHaveURL("https://www.automationexercise.com/products");
-    await expect(page.locator(".features_items")).toBeVisible();
-    const productCards = page.getByRole("link", {name : " View Product"}).locator("../..");
-    await page.getByRole("link", {name : " View Product"}).first().click();
-    await expect(page.locator('section')).toMatchAriaSnapshot(`
-      - img "ecommerce website products"
-      - heading "Blue Top" [level=2]
-      - paragraph: "Category: Women > Tops"
-      - img "ecommerce website products"
-      - text: /Rs\\. \\d+ Quantity:/
-      - spinbutton: "1"
-      - button " Add to cart"
-      - paragraph: "Availability: In Stock"
-      - paragraph: "Condition: New"
-      - paragraph: "Brand: Polo"
-      `);
-    page.close()
+test("@AutomationExercise Verify products page and product detail page", async()=>{
+  const poManager = new POManager(page);
+  const BasePage = poManager.getBasePage();
+  const ProductsPage = poManager.getProductsPage()
+  await BasePage.goToProductsPage();
+  await expect(page).toHaveURL("https://www.automationexercise.com/products");
+  await expect(ProductsPage.productsSection).toBeVisible();
+  await ProductsPage.viewProductInfo(1);
+  await expect(ProductsPage.mainSection).toMatchAriaSnapshot(ProductsPage.blueTopSectionSnapShot);
+  page.close()
 });
 
-test("Search product", async ()=>{
-    await page.getByRole("link", {name : " Products"}).click();
-    await expect(page).toHaveURL("https://www.automationexercise.com/products");
-    await expect(page.locator(".features_items")).toBeVisible();
-    const productCards = page.getByRole("link", {name : " View Product"}).locator("../../../..");
-    const nameProduct = await productCards.first().getByRole("paragraph").nth(1).textContent();
-    await page.getByRole("textbox", {name : "Search Product"}).fill(nameProduct);
-    await page.locator("#submit_search").click();
-    await expect(productCards).toHaveCount(1);
-    await expect(productCards).toContainText(nameProduct);
-    page.close()
+test("@AutomationExercise Search product", async ()=>{
+  const poManager = new POManager(page);
+  const BasePage = poManager.getBasePage();
+  const ProductsPage = poManager.getProductsPage()
+  await BasePage.goToProductsPage();
+  await expect(page).toHaveURL("https://www.automationexercise.com/products");
+  await expect(ProductsPage.productsSection).toBeVisible();
+  const nameProduct = await ProductsPage.searchNameProduct(1);
+  await expect(ProductsPage.ProductCards.productCardsLocator).toHaveCount(1);
+  await expect(ProductsPage.ProductCards.productCardsNameProduct).toContainText(nameProduct);
+  page.close()
 });
 
-test("Verify Subscription in home page", async ()=>{
-    await expect(page.locator("#footer").getByRole("heading", {name : "Subscription"})).toBeVisible();
-    await page.getByRole("textbox", {name : "Your email address"}).fill(process.env.AUTOMATIONEXERCISE_email);
-    await page.locator('#subscribe').click();
-    await expect(page.locator("#footer").getByText("You have been successfully subscribed!")).toContainText("You have been successfully subscribed!");
-    page.close()
+test("@AutomationExercise Verify Subscription in home page", async ()=>{
+    const poManager = new POManager(page);
+    const BasePage = poManager.getBasePage();
+    await expect(BasePage.subscriptionFooterTitle).toBeVisible();
+    await BasePage.userSubscription();
+    await expect(BasePage.subscriptionMessage).toContainText("You have been successfully subscribed!");
+    page.close();
 });
 
-test("Verify subscription in cart page", async ()=>{
-    await page.getByRole("link", {name : "Cart"}).click();
+test("@AutomationExercise Verify subscription in cart page", async ()=>{
+    const poManager = new POManager(page);
+    const BasePage = poManager.getBasePage();
+    await BasePage.goToCart();
     await expect(page).toHaveURL("https://www.automationexercise.com/view_cart");
-    await expect(page.locator("#footer").getByRole("heading", {name : "Subscription"})).toBeVisible();
-    await page.getByRole("textbox", {name : "Your email address"}).fill(process.env.AUTOMATIONEXERCISE_email);
-    await page.locator('#subscribe').click();
-    await expect(page.locator("#footer").getByText("You have been successfully subscribed!")).toContainText("You have been successfully subscribed!");
+    await expect(BasePage.subscriptionFooterTitle).toBeVisible();
+    await BasePage.userSubscription();
+    await expect(BasePage.subscriptionMessage).toContainText("You have been successfully subscribed!");
     page.close()
 });
 
-test("Add products in Cart", async ()=>{
-    await page.getByRole("link", {name : " Products"}).click();
+test("@AutomationExercise Add products in Cart", async ()=>{
+    const poManager = new POManager(page);
+    const BasePage = poManager.getBasePage();
+    const ProductsPage = poManager.getProductsPage();
+    const CartPage = poManager.getCartPage();
+    await BasePage.goToProductsPage();
     await expect(page).toHaveURL("https://www.automationexercise.com/products");
-    await expect(page.locator(".features_items")).toBeVisible();
-    const productCards = page.getByRole("link", {name : " View Product"}).locator("../../../..");
-    const priceProduct1 = await productCards.first().getByRole("heading").nth(1).textContent();
-    const nameProduct1 = await productCards.first().getByRole("paragraph").nth(1).textContent();
-    await productCards.first().hover();
-    await productCards.first().getByText("Add to cart").first().click();
-    await dismissModalProductInCart();
-    const priceProduct2 = await productCards.nth(1).getByRole("heading").nth(1).textContent();
-    const nameProduct2 = await productCards.nth(1).getByRole("paragraph").nth(1).textContent();
-    await productCards.nth(1).hover();  
-    await productCards.nth(1).getByText("Add to cart").first().click();
-    await dismissModalProductInCart();
-    await page.getByRole("link", {name : "Cart"}).click();
-    await expect(page.locator("tr")).toHaveCount(3);
-    await expect(page.locator(".cart_description").filter({hasText : `${nameProduct1}`})).toContainText(`${nameProduct1}`);
-    await expect(page.locator(".cart_description").filter({hasText : `${nameProduct2}`})).toContainText(`${nameProduct2}`);
-    await expect(page.locator(".cart_price").filter({hasText : `${priceProduct1}`})).toContainText(`${priceProduct1}`);
-    await expect(page.locator(".cart_price").filter({hasText : `${priceProduct2}`})).toContainText(`${priceProduct2}`);
-    const quantityProduct1 = await page.locator(".cart_quantity").first().textContent();
-    const quantityProduct2 = await page.locator(".cart_quantity").nth(1).textContent();
-    const priceProduct1Split = (await (page.locator(".cart_price").first().textContent())).split(" ");
-    const priceProduct2Split = (await (page.locator(".cart_price").nth(1).textContent())).split(" ");
-    const priceProduct1cart = priceProduct1Split[1];
-    const priceProduct2cart = priceProduct2Split[1];
-    //to verify the business logic
-    const total1 = (Number(priceProduct1cart) * Number(quantityProduct1)).toString();
-    const total2 = (Number(priceProduct2cart) * Number(quantityProduct2)).toString();
-    await expect(page.locator(".cart_quantity").first()).toContainText("1");
-    await expect(page.locator(".cart_quantity").nth(1)).toContainText("1");
-    await expect.soft(page.locator(".cart_total").first()).toContainText(`Rs. ${total1}`);
-    await expect.soft(page.locator(".cart_total").nth(1)).toContainText(`Rs. ${total2}`);
+    await expect(ProductsPage.productsSection).toBeVisible();
+    const priceProduct1 = await ProductsPage.getPriceProduct(1);
+    const nameProduct1 = await ProductsPage.getNameProduct(1);
+    await ProductsPage.addProductInCart(1);
+    const priceProduct2 = await ProductsPage.getPriceProduct(2);
+    const nameProduct2 = await ProductsPage.getNameProduct(2);
+    await ProductsPage.addProductInCart(2);
+    await BasePage.goToCart();
+    await expect(CartPage.cartRow).toHaveCount(2);
+    await expect(CartPage.cartProductDescription.filter({hasText : `${nameProduct1}`})).toContainText(`${nameProduct1}`);
+    await expect(CartPage.cartProductDescription.filter({hasText : `${nameProduct2}`})).toContainText(`${nameProduct2}`);
+    await CartPage.setCartProductRow(1);
+    await expect(CartPage.cartProductPrice).toContainText(`${priceProduct1}`);
+    await expect(CartPage.cartProductQuantity).toContainText("1");
+    const total1 = await CartPage.calculateProductTotal(1);
+    await expect(CartPage.cartProductTotal).toContainText(`Rs. ${total1}`);
+    await CartPage.setCartProductRow(2);
+    await expect(CartPage.cartProductPrice).toContainText(`${priceProduct2}`);  
+    await expect(CartPage.cartProductQuantity).toContainText("1");
+    const total2 = await CartPage.calculateProductTotal(2);
+    await expect(page.locator(".cart_total").nth(1)).toContainText(`Rs. ${total2}`);
     page.close()
 });
 
-test("Verify Product quantity in Cart", async ()=>{
-    await page.getByRole("link", {name : " Products"}).click();
+test("@AutomationExercise Verify Product quantity in Cart", async ()=>{
+    const poManager = new POManager(page);
+    const BasePage = poManager.getBasePage();
+    const ProductsPage = poManager.getProductsPage();
+    const ProductPage = poManager.getProductPage();
+    const CartPage = poManager.getCartPage();
+    await BasePage.goToProductsPage();
     await expect(page).toHaveURL("https://www.automationexercise.com/products");
-    await expect(page.locator(".features_items")).toBeVisible();
-    await page.getByRole("link", {name : " View Product"}).first().click();
-    await page.getByRole("spinbutton").fill("4");
-    await page.getByRole('button', { name: ' Add to cart' }).click();
-    await dismissModalProductInCart();
-    await page.getByRole("link", {name : "Cart"}).click();
-    await expect(page.locator(".cart_quantity").first()).toContainText("4");
+    await expect(ProductsPage.productsSection).toBeVisible();
+    await ProductsPage.viewProductInfo(1);
+    const quantity = await ProductPage.chooseProductQuantity(4)
+    await BasePage.goToCart();
+    await CartPage.setCartProductRow(1);
+    await expect(CartPage.cartProductQuantity).toContainText(quantity);
     page.close()
 });
 
-test("Place order: Register while checkout", async ()=>{
+test("@AutomationExercise Place order: Register while checkout", async ()=>{
+    const poManager = new POManager(page);
+    const BasePage = poManager.getBasePage();
+    const LoginPage = poManager.getLoginPage();
+    const registrationPage = poManager.getRegistrationPage()
+    const MainPage = poManager.getMainPage();
+    const CartPage = poManager.getCartPage();
+    const CheckoutPage = poManager.getCheckoutPage();
+    const fakeName = faker.person.fullName();
     const fakeEmail = faker.internet.exampleEmail({allowSpecialCharacters: true })
-    const productCards = page.getByRole("link", {name : " View Product"}).locator("../../../..");
-    await productCards.first().hover();
-    await productCards.first().getByText("Add to cart").first().click();
-    await dismissModalProductInCart();
-    await page.getByRole("link", {name : "Cart"}).click();
-    await page.locator("a.btn.btn-default.check_out").click();
-    await page.getByRole('paragraph').filter({has:(page.locator("[href='/login']"))}).click();
-    await expect(page.getByRole("heading", {name : "New User Signup!"})).toBeVisible();
-    const SignupForm = page.locator(".signup-form");
-    await SignupForm.getByPlaceholder("Name").fill("John Doe");
-    await SignupForm.getByPlaceholder("Email Address").fill(fakeEmail);
-    await SignupForm.getByRole("button", {name : "Signup"}).click();
-    await expect(page).toHaveURL("https://www.automationexercise.com/signup");
-    await expect(page.getByText("Enter Account Information")).toBeVisible();
-    await page.getByRole("radio", {name : " Mr. "}).click();
-    await page.getByRole("textbox", {name : "password"}).fill("Password123");
-    await page.locator("#days").selectOption({value : "4"});
-    await page.locator("#months").selectOption({value : "2"});
-    await page.locator("#years").selectOption({value : "2000"});
-    await page.getByRole("checkbox", {name : "Sign up for our newsletter!"});
-    await page.getByLabel("First name ").fill("John");
-    await page.getByLabel("Last name ").fill("Doe");
-    await page.getByLabel("Company").first().fill("Google");
-    await page.getByRole("textbox", {name : "Address * (Street address, P."}).fill("Google");
-    await page.getByRole("combobox", {name : "Country"}).selectOption({value : "Canada"});
-    await page.getByRole("textbox", {name : "State"}).fill("Quebec");
-    await page.getByRole("textbox", {name : "City"}).fill("Montreal");
-    await page.locator('#zipcode').fill("213456");
-    await page.getByRole("textbox", {name : "Mobile Number"}).fill("0123456789");
-    await page.getByRole("button", {name : "Create Account"}).click();
-    await expect(page.getByText("Account created!")).toBeVisible();
-    await page.getByRole("link", {name : "Continue"}).click();
-    await expect(page.getByText("Logged in as")).toHaveText(/Logged in as \w+/);
-    await page.getByRole("link", {name : "Cart"}).first().click();
-    await page.locator("a.btn.btn-default.check_out").click();
-    const yourDeliveryAddressList = await page.getByRole("heading",{name : "Your delivery address"}).locator("../../..");
-    //const yourDeliveryAddressList = await page.getByRole("list").filter({has : page.getByRole("heading", {name : "Your delivery address"}) });
-    await expect (yourDeliveryAddressList.getByRole("listitem").nth(1)).toContainText("Mr. John Doe");
-    await expect (yourDeliveryAddressList.getByRole("listitem").nth(2)).toContainText("Google");
-    await expect (yourDeliveryAddressList.getByRole("listitem").nth(3)).toContainText("Google");
-    await expect (yourDeliveryAddressList.getByRole("listitem").nth(5)).toContainText("Montreal Quebec 213456");
-    await expect (yourDeliveryAddressList.getByRole("listitem").nth(6)).toContainText("Canada");
-    await expect (yourDeliveryAddressList.getByRole("listitem").nth(7)).toContainText("0123456789");
-    const yourBillingAddressList = await page.getByRole("heading",{name : "Your billing address"}).locator("../../..");
-    //const yourBillingAddressList = await page.getByRole("list").filter({has : page.getByRole("heading", {name : "Your delivery address"}) });
-    await expect (yourBillingAddressList.getByRole("listitem").nth(1)).toContainText("Mr. John Doe");
-    await expect (yourBillingAddressList.getByRole("listitem").nth(2)).toContainText("Google");
-    await expect (yourBillingAddressList.getByRole("listitem").nth(3)).toContainText("Google");
-    await expect (yourBillingAddressList.getByRole("listitem").nth(5)).toContainText("Montreal Quebec 213456");
-    await expect (yourBillingAddressList.getByRole("listitem").nth(6)).toContainText("Canada");
-    await expect (yourBillingAddressList.getByRole("listitem").nth(7)).toContainText("0123456789");
-    await page.getByRole("textbox").first().fill("testing checkout");
-    await page.getByRole("link", {name : "Place Order"}).click();
-    await expect(page).toHaveURL("https://www.automationexercise.com/payment");
-    await page.getByRole("textbox").first().fill("1234567897654");
-    await page.getByRole("textbox").nth(1).fill("John Doe");
-    await page.getByRole("textbox", {name : "ex. 311"}).fill("312");
-    await page.getByRole("textbox", {name : "MM"}).fill("12");
-    await page.getByRole("textbox", {name : "YY"}).fill("2032");
-    await page.getByRole("button", {name : "Pay and Confirm Order"}).click();
-    await expect(page.getByRole("heading", {name : "ORDER PLACED!"})).toBeVisible();
-    await expect(page.getByRole("paragraph").filter({hasText : "Congratulations! Your order has been confirmed!"})).toBeVisible();
-    await page.getByRole("link", {name : " Delete Account"}).click();
-    await expect(page.getByText("Account Deleted!")).toBeVisible();
-    await page.getByRole("link", {name : "Continue"}).click();
+    await MainPage.addProductInCart(1);
+    await BasePage.goToCart();
+    await CartPage.goToCheckOut();
+    await CartPage.dialogLoginButton.click();
+    await expect(LoginPage.userSignupHeading).toBeVisible();
+  await LoginPage.beginUserRegistration(fakeName, fakeEmail);
+  await expect(page).toHaveURL("https://www.automationexercise.com/signup");
+  await expect(registrationPage.registrationPageTitle).toBeVisible();
+  await registrationPage.registerationNewUser();
+  await expect(registrationPage.creationValidationText).toBeVisible();
+  await registrationPage.continueLinkLocator.click();
+  await expect(BasePage.loggedAsLocator).toHaveText(/Logged in as \w+/);
+    await BasePage.goToCart();
+    await CartPage.goToCheckOut();
+    await expect (CheckoutPage.yourDeliveryAddressName).toContainText("Mr. John Doe");
+    await expect (CheckoutPage.yourDeliveryAddressCompany).toContainText("Google");
+    await expect (CheckoutPage.yourDeliveryAddress).toContainText("Google");
+    await expect (CheckoutPage.yourDeliveryAddressLocation).toContainText("Montreal Quebec 213456");
+    await expect (CheckoutPage.yourDeliveryAddressCountry).toContainText("Canada");
+    await expect (CheckoutPage.yourDeliveryAddressPhone).toContainText("0123456789");
+    await expect (CheckoutPage.yourBillingAddressName).toContainText("Mr. John Doe");
+    await expect (CheckoutPage.yourBillingAddressCompany).toContainText("Google");
+    await expect (CheckoutPage.yourBillingAddress).toContainText("Google");
+    await expect (CheckoutPage.yourBillingAddressLocation).toContainText("Montreal Quebec 213456");
+    await expect (CheckoutPage.yourBillingAddressCountry).toContainText("Canada");
+    await expect (CheckoutPage.yourBillingAddressPhone).toContainText("0123456789");
+    await CheckoutPage.orderCheckout();
+    await CheckoutPage.fillCreditCardInfo();
+    await expect(CheckoutPage.orderSuccessMessage).toBeVisible();
+    await BasePage.deleteUser();
     page.close();
 });
 
-test("Place order: Register before checkout", async ()=> {
+test("@AutomationExercise Place order: Register before checkout", async ()=> {
+  const poManager = new POManager(page);
+    const BasePage = poManager.getBasePage();
+    const LoginPage = poManager.getLoginPage();
+    const registrationPage = poManager.getRegistrationPage()
+    const MainPage = poManager.getMainPage();
+    const CartPage = poManager.getCartPage();
+    const CheckoutPage = poManager.getCheckoutPage();
+    const fakeName = faker.person.fullName();
     const fakeEmail = faker.internet.exampleEmail({allowSpecialCharacters: true })
-    await page.getByRole("link", {name : " Signup / Login"}).click();
-    await expect(page.getByRole("heading", {name : "New User Signup!"})).toBeVisible();
-    const SignupForm = page.locator(".signup-form");
-    await SignupForm.getByPlaceholder("Name").fill("John Doe");
-    await SignupForm.getByPlaceholder("Email Address").fill(fakeEmail);
-    await SignupForm.getByRole("button", {name : "Signup"}).click();
-    await expect(page).toHaveURL("https://www.automationexercise.com/signup");
-    await expect(page.getByText("Enter Account Information")).toBeVisible();
-    await page.getByRole("radio", {name : " Mr. "}).click();
-    await page.getByRole("textbox", {name : "password"}).fill("Password123");
-    await page.locator("#days").selectOption({value : "4"});
-    await page.locator("#months").selectOption({value : "2"});
-    await page.locator("#years").selectOption({value : "2000"});
-    await page.getByRole("checkbox", {name : "Sign up for our newsletter!"});
-    await page.getByLabel("First name ").fill("John");
-    await page.getByLabel("Last name ").fill("Doe");
-    await page.getByLabel("Company").first().fill("Google");
-    await page.getByRole("textbox", {name : "Address * (Street address, P."}).fill("Google");
-    await page.getByRole("combobox", {name : "Country"}).selectOption({value : "Canada"});
-    await page.getByRole("textbox", {name : "State"}).fill("Quebec");
-    await page.getByRole("textbox", {name : "City"}).fill("Montreal");
-    await page.locator('#zipcode').fill("213456");
-    await page.getByRole("textbox", {name : "Mobile Number"}).fill("0123456789");
-    await page.getByRole("button", {name : "Create Account"}).click();
-    await expect(page.getByText("Account created!")).toBeVisible();
-    await page.getByRole("link", {name : "Continue"}).click();
-    await expect(page.getByText("Logged in as")).toHaveText(/Logged in as \w+/);
-    const productCards = page.getByRole("link", {name : " View Product"}).locator("../../../..");
-    await productCards.first().hover();
-    await page.waitForLoadState("networkidle");
-    await productCards.first().getByText("Add to cart").first().click();
-    await dismissModalProductInCart();
-    await page.getByRole("link", {name : "Cart"}).click();
-    await page.locator("a.btn.btn-default.check_out").click();
-    const yourDeliveryAddressList = await page.getByRole("heading",{name : "Your delivery address"}).locator("../../..");
-    await expect (yourDeliveryAddressList.getByRole("listitem").nth(1)).toContainText("Mr. John Doe");
-    await expect (yourDeliveryAddressList.getByRole("listitem").nth(2)).toContainText("Google");
-    await expect (yourDeliveryAddressList.getByRole("listitem").nth(3)).toContainText("Google");
-    await expect (yourDeliveryAddressList.getByRole("listitem").nth(5)).toContainText("Montreal Quebec 213456");
-    await expect (yourDeliveryAddressList.getByRole("listitem").nth(6)).toContainText("Canada");
-    await expect (yourDeliveryAddressList.getByRole("listitem").nth(7)).toContainText("0123456789");
-    const yourBillingAddressList = await page.getByRole("heading",{name : "Your billing address"}).locator("../../..");
-    await expect (yourBillingAddressList.getByRole("listitem").nth(1)).toContainText("Mr. John Doe");
-    await expect (yourBillingAddressList.getByRole("listitem").nth(2)).toContainText("Google");
-    await expect (yourBillingAddressList.getByRole("listitem").nth(3)).toContainText("Google");
-    await expect (yourBillingAddressList.getByRole("listitem").nth(5)).toContainText("Montreal Quebec 213456");
-    await expect (yourBillingAddressList.getByRole("listitem").nth(6)).toContainText("Canada");
-    await expect (yourBillingAddressList.getByRole("listitem").nth(7)).toContainText("0123456789");
-    await page.getByRole("textbox").first().fill("testing checkout");
-    await page.getByRole("link", {name : "Place Order"}).click();
-    await expect(page).toHaveURL("https://www.automationexercise.com/payment");
-    await page.getByRole("textbox").first().fill("1234567897654");
-    await page.getByRole("textbox").nth(1).fill("John Doe");
-    await page.getByRole("textbox", {name : "ex. 311"}).fill("312");
-    await page.getByRole("textbox", {name : "MM"}).fill("12");
-    await page.getByRole("textbox", {name : "YY"}).fill("2032");
-    await page.getByRole("button", {name : "Pay and Confirm Order"}).click();
-    await expect(page.getByRole("heading", {name : "ORDER PLACED!"})).toBeVisible();
-    await expect(page.getByRole("paragraph").filter({hasText : "Congratulations! Your order has been confirmed!"})).toBeVisible();
-    await page.getByRole("link", {name : " Delete Account"}).click();
-    await expect(page.getByText("Account Deleted!")).toBeVisible();
-    await page.getByRole("link", {name : "Continue"}).click();
+    await BasePage.goToSignUpPage();
+    await LoginPage.beginUserRegistration(fakeName, fakeEmail);
+    await registrationPage.registerationNewUser();  
+  await expect(registrationPage.creationValidationText).toBeVisible();
+  await registrationPage.continueLinkLocator.click();
+  await expect(BasePage.loggedAsLocator).toHaveText(/Logged in as \w+/);
+    await MainPage.addProductInCart(1);
+    await BasePage.goToCart();
+    await CartPage.goToCheckOut();
+    await expect (CheckoutPage.yourDeliveryAddressName).toContainText("Mr. John Doe");
+    await expect (CheckoutPage.yourDeliveryAddressCompany).toContainText("Google");
+    await expect (CheckoutPage.yourDeliveryAddress).toContainText("Google");
+    await expect (CheckoutPage.yourDeliveryAddressLocation).toContainText("Montreal Quebec 213456");
+    await expect (CheckoutPage.yourDeliveryAddressCountry).toContainText("Canada");
+    await expect (CheckoutPage.yourDeliveryAddressPhone).toContainText("0123456789");
+    await expect (CheckoutPage.yourBillingAddressName).toContainText("Mr. John Doe");
+    await expect (CheckoutPage.yourBillingAddressCompany).toContainText("Google");
+    await expect (CheckoutPage.yourBillingAddress).toContainText("Google");
+    await expect (CheckoutPage.yourBillingAddressLocation).toContainText("Montreal Quebec 213456");
+    await expect (CheckoutPage.yourBillingAddressCountry).toContainText("Canada");
+    await expect (CheckoutPage.yourBillingAddressPhone).toContainText("0123456789");
+    await CheckoutPage.orderCheckout();
+    await CheckoutPage.fillCreditCardInfo();
+    await expect(CheckoutPage.orderSuccessMessage).toBeVisible();
+    await BasePage.deleteUser();
     page.close();
 });
 
-test("Place order: Login before checkout", async ()=>{
-    await page.getByRole("link", {name : " Signup / Login"}).click();
-    await expect(page.getByRole("heading", {name : "Login to your account"})).toBeVisible();
-    const loginFormLocator = page.locator(".login-form");
-    await loginFormLocator.getByPlaceholder("Email Address").fill(`${process.env.AUTOMATIONEXERCISE_email}`);
-    await loginFormLocator.getByPlaceholder("Password").fill(`${process.env.AUTOMATIONEXERCISE_password}`);
-    await loginFormLocator.getByRole("button", {name : "Login"}).click();
-    await expect(page.getByText("Logged in as")).toHaveText(/Logged in as \w+/);
-    const productCards = page.getByRole("link", {name : " View Product"}).locator("../../../..");
-    await productCards.first().hover();
-    await productCards.first().getByText("Add to cart").first().click();
-    await dismissModalProductInCart();
-    await page.getByRole("link", {name : " Cart"}).first().click();
-    await page.locator("a.btn.btn-default.check_out").click();
-    const yourDeliveryAddressList = await page.getByRole("heading",{name : "Your delivery address"}).locator("../../..");
-    await expect (yourDeliveryAddressList.getByRole("listitem").nth(1)).toContainText("Mr. John Doe");
-    await expect (yourDeliveryAddressList.getByRole("listitem").nth(2)).toContainText("Google");
-    await expect (yourDeliveryAddressList.getByRole("listitem").nth(3)).toContainText("Google");
-    await expect (yourDeliveryAddressList.getByRole("listitem").nth(5)).toContainText("Montreal Quebec 213456");
-    await expect (yourDeliveryAddressList.getByRole("listitem").nth(6)).toContainText("Canada");
-    await expect (yourDeliveryAddressList.getByRole("listitem").nth(7)).toContainText("0123456789");
-    const yourBillingAddressList = await page.getByRole("heading",{name : "Your billing address"}).locator("../../..");
-    await expect (yourBillingAddressList.getByRole("listitem").nth(1)).toContainText("Mr. John Doe");
-    await expect (yourBillingAddressList.getByRole("listitem").nth(2)).toContainText("Google");
-    await expect (yourBillingAddressList.getByRole("listitem").nth(3)).toContainText("Google");
-    await expect (yourBillingAddressList.getByRole("listitem").nth(5)).toContainText("Montreal Quebec 213456");
-    await expect (yourBillingAddressList.getByRole("listitem").nth(6)).toContainText("Canada");
-    await expect (yourBillingAddressList.getByRole("listitem").nth(7)).toContainText("0123456789");
-    await page.getByRole("textbox").first().fill("testing checkout");
-    await page.getByRole("link", {name : "Place Order"}).click();
-    await expect(page).toHaveURL("https://www.automationexercise.com/payment");
-    await page.getByRole("textbox").first().fill("1234567897654");
-    await page.getByRole("textbox").nth(1).fill("John Doe");
-    await page.getByRole("textbox", {name : "ex. 311"}).fill("312");
-    await page.getByRole("textbox", {name : "MM"}).fill("12");
-    await page.getByRole("textbox", {name : "YY"}).fill("2032");
-    await page.getByRole("button", {name : "Pay and Confirm Order"}).click();
-    await expect(page.getByRole("heading", {name : "ORDER PLACED!"})).toBeVisible();
-    await expect(page.getByRole("paragraph").filter({hasText : "Congratulations! Your order has been confirmed!"})).toBeVisible();
-    page.close();
-});
-test("Remove product from cart", async ()=>{
-    const productCards = page.getByRole("link", {name : " View Product"}).locator("../../../..");
-    const priceProduct1 = await productCards.first().getByRole("heading").nth(1).textContent();
-    const nameProduct1 = await productCards.first().getByRole("paragraph").nth(1).textContent();
-    await productCards.first().hover();
-    await productCards.first().getByText("Add to cart").first().click();
-    await dismissModalProductInCart();
-    await page.getByRole("link", {name : "Cart"}).click();
-    await expect(page.locator("tr")).toHaveCount(2);
-    await expect(page.locator(".cart_description").filter({hasText : `${nameProduct1}`})).toContainText(`${nameProduct1}`);
-    await expect(page.locator(".cart_price").filter({hasText : `${priceProduct1}`})).toContainText(`${priceProduct1}`);
-    await page.locator(".cart_description").filter({hasText : `${nameProduct1}`}).locator("..").locator('.cart_quantity_delete').click();
-    await expect(page.locator(".cart_description").filter({hasText : `${nameProduct1}`})).toHaveCount(0);
-    await expect(page.locator('#cart_items')).toMatchAriaSnapshot(`
-      - list:
-        - listitem:
-          - link "Home":
-            - /url: /
-        - listitem: Shopping Cart
-      - paragraph:
-        - text: Cart is empty! Click
-        - link "here":
-          - /url: /products
-        - text: to buy products.
-      `);
+
+test("@AutomationExercise Place order: Login before checkout", async ()=>{
+  const poManager = new POManager(page);
+  const BasePage = poManager.getBasePage();
+    const LoginPage = poManager.getLoginPage();
+    const MainPage = poManager.getMainPage();
+    const CartPage = poManager.getCartPage();
+    const CheckoutPage = poManager.getCheckoutPage();
+  await BasePage.goToSignUpPage();
+  await LoginPage.userLogin(process.env.AUTOMATIONEXERCISE_email, process.env.AUTOMATIONEXERCISE_password);
+  await expect(BasePage.loggedAsLocator).toHaveText(/Logged in as \w+/);
+  await MainPage.addProductInCart(1);
+  await BasePage.goToCart();
+  await CartPage.goToCheckOut();
+  await expect (CheckoutPage.yourDeliveryAddressName).toContainText("Mr. John Doe");
+    await expect (CheckoutPage.yourDeliveryAddressCompany).toContainText("Google");
+    await expect (CheckoutPage.yourDeliveryAddress).toContainText("Google");
+    await expect (CheckoutPage.yourDeliveryAddressLocation).toContainText("Montreal Quebec 213456");
+    await expect (CheckoutPage.yourDeliveryAddressCountry).toContainText("Canada");
+    await expect (CheckoutPage.yourDeliveryAddressPhone).toContainText("0123456789");
+    await expect (CheckoutPage.yourBillingAddressName).toContainText("Mr. John Doe");
+    await expect (CheckoutPage.yourBillingAddressCompany).toContainText("Google");
+    await expect (CheckoutPage.yourBillingAddress).toContainText("Google");
+    await expect (CheckoutPage.yourBillingAddressLocation).toContainText("Montreal Quebec 213456");
+    await expect (CheckoutPage.yourBillingAddressCountry).toContainText("Canada");
+    await expect (CheckoutPage.yourBillingAddressPhone).toContainText("0123456789");
+    await CheckoutPage.orderCheckout();
+    await CheckoutPage.fillCreditCardInfo();
+    await expect(CheckoutPage.orderSuccessMessage).toBeVisible();
     page.close();
 });
 
-test("View category product", async()=>{
-    await page.getByRole('link', { name: ' Women' }).click();
-    await page.getByRole('link', { name: 'Tops' }).click();
-    await expect(page.getByRole("heading", {name : "WOMEN - TOPS PRODUCTS"})).toBeVisible();
-    await expect(page.locator('section')).toMatchAriaSnapshot(`
-      - heading "Women - Tops Products" [level=2]
-      - img "ecommerce website products"
-      - heading /Rs\\. \\d+/ [level=2]
-      - paragraph: Blue Top
-      - link " Add to cart":
-        - /url: javascript:void();
-      - heading /Rs\\. \\d+/ [level=2]
-      - paragraph: Blue Top
-      - link " Add to cart":
-        - /url: javascript:void();
-      - list:
-        - listitem:
-          - link " View Product":
-            - /url: /product_details/1
-      - img "ecommerce website products"
-      - heading /Rs\\. \\d+/ [level=2]
-      - paragraph: Winter Top
-      - link " Add to cart":
-        - /url: javascript:void();
-      - heading /Rs\\. \\d+/ [level=2]
-      - paragraph: Winter Top
-      - link " Add to cart":
-        - /url: javascript:void();
-      - list:
-        - listitem:
-          - link " View Product":
-            - /url: /product_details/5
-      - img "ecommerce website products"
-      - heading /Rs\\. \\d+/ [level=2]
-      - paragraph: Summer White Top
-      - link " Add to cart":
-        - /url: javascript:void();
-      - heading /Rs\\. \\d+/ [level=2]
-      - paragraph: Summer White Top
-      - link " Add to cart":
-        - /url: javascript:void();
-      - list:
-        - listitem:
-          - link " View Product":
-            - /url: /product_details/6
-      - img "ecommerce website products"
-      - heading /Rs\\. \\d+/ [level=2]
-      - paragraph: Madame Top For Women
-      - link " Add to cart":
-        - /url: javascript:void();
-      - heading /Rs\\. \\d+/ [level=2]
-      - paragraph: Madame Top For Women
-      - link " Add to cart":
-        - /url: javascript:void();
-      - list:
-        - listitem:
-          - link " View Product":
-            - /url: /product_details/7
-      - img "ecommerce website products"
-      - heading /Rs\\. \\d+/ [level=2]
-      - paragraph: Fancy Green Top
-      - link " Add to cart":
-        - /url: javascript:void();
-      - heading /Rs\\. \\d+/ [level=2]
-      - paragraph: Fancy Green Top
-      - link " Add to cart":
-        - /url: javascript:void();
-      - list:
-        - listitem:
-          - link " View Product":
-            - /url: /product_details/8
-      - img "ecommerce website products"
-      - heading /Rs\\. \\d+/ [level=2]
-      - paragraph: Lace Top For Women
-      - link " Add to cart":
-        - /url: javascript:void();
-      - heading /Rs\\. \\d+/ [level=2]
-      - paragraph: Lace Top For Women
-      - link " Add to cart":
-        - /url: javascript:void();
-      - list:
-        - listitem:
-          - link " View Product":
-            - /url: /product_details/42
-      `);
-    await page.getByRole('link', { name: ' Men' }).click();
-    await page.getByRole('link', { name: 'Jeans', exact: true }).click();
-    await expect(page.locator('section')).toContainText('Men - Jeans Products');
-    await expect(page.locator('section')).toMatchAriaSnapshot(`
-      - heading "Men - Jeans Products" [level=2]
-      - img "ecommerce website products"
-      - heading /Rs\\. \\d+/ [level=2]
-      - paragraph: Soft Stretch Jeans
-      - link " Add to cart":
-        - /url: javascript:void();
-      - heading /Rs\\. \\d+/ [level=2]
-      - paragraph: Soft Stretch Jeans
-      - link " Add to cart":
-        - /url: javascript:void();
-      - list:
-        - listitem:
-          - link " View Product":
-            - /url: /product_details/33
-      - img "ecommerce website products"
-      - heading /Rs\\. \\d+/ [level=2]
-      - paragraph: Regular Fit Straight Jeans
-      - link " Add to cart":
-        - /url: javascript:void();
-      - heading /Rs\\. \\d+/ [level=2]
-      - paragraph: Regular Fit Straight Jeans
-      - link " Add to cart":
-        - /url: javascript:void();
-      - list:
-        - listitem:
-          - link " View Product":
-            - /url: /product_details/35
-      - img "ecommerce website products"
-      - heading /Rs\\. \\d+/ [level=2]
-      - paragraph: Grunt Blue Slim Fit Jeans
-      - link " Add to cart":
-        - /url: javascript:void();
-      - heading /Rs\\. \\d+/ [level=2]
-      - paragraph: Grunt Blue Slim Fit Jeans
-      - link " Add to cart":
-        - /url: javascript:void();
-      - list:
-        - listitem:
-          - link " View Product":
-            - /url: /product_details/37
-      `);
+test("@AutomationExercise Remove product from cart", async ()=>{
+  const poManager = new POManager(page);
+  const BasePage = poManager.getBasePage();
+    const MainPage = poManager.getMainPage();
+    const CartPage = poManager.getCartPage();
+    const priceProduct = await MainPage.getPriceProduct(1);
+    const nameProduct = await MainPage.getNameProduct(1);
+    await MainPage.addProductInCart(1);
+    await BasePage.goToCart();
+    await expect(CartPage.cartRow).toHaveCount(1);
+    CartPage.setCartProductRow(1)
+    await expect(CartPage.cartProductDescription.filter({hasText : `${nameProduct}`})).toContainText(`${nameProduct}`);
+    await expect.soft(CartPage.cartProductPrice).toContainText(`${priceProduct}`);
+    await CartPage.deleteCartProduct(1);
+    await expect(CartPage.cartProductDescription).toHaveCount(0);
+    await expect(CartPage.cartSection).toMatchAriaSnapshot(CartPage.emptyCartSnapShot);
     page.close();
 });
+
+test("@AutomationExercise View category product", async()=>{
+    const poManager = new POManager(page);
+    const MainPage = poManager.getMainPage();
+    const ProductsPage = poManager.getProductsPage();
+    await MainPage.womenProductCategory.click();
+    await MainPage.topProductCategory.click();
+    await expect(MainPage.womenTopProductTitle).toBeVisible();
+    await expect(ProductsPage.mainSection).toMatchAriaSnapshot(ProductsPage.womenTopSectionSnapShot);
+    await MainPage.menProductCategory.click();
+    await MainPage.jeansProductCategory.click();
+    await expect(ProductsPage.mainSection).toContainText('Men - Jeans Products');
+    await expect(ProductsPage.mainSection).toMatchAriaSnapshot(ProductsPage.menJeansSectionSnapShot);
+    page.close();
+});
+
+
+test("@AutomationExercise View and cart brand product", async ()=>{
+    const poManager = new POManager(page);
+    const BasePage = poManager.getBasePage();
+    const ProductsPage = poManager.getProductsPage();
+    await BasePage.goToProductsPage();
+    await expect(page).toHaveURL("https://www.automationexercise.com/products");
+    await expect(ProductsPage.brandSection).toBeVisible();
+    await ProductsPage.poloBrand.click();
+    await expect(page).toHaveURL("https://www.automationexercise.com/brand_products/Polo");
+    await expect(ProductsPage.poloPageTitle).toBeVisible();
+    await ProductsPage.madameBrand.click();
+    await expect(page).toHaveURL("https://www.automationexercise.com/brand_products/Madame");
+    await expect(ProductsPage.madamePageTitle).toBeVisible();
+    page.close();
+});
+
+
+test("@AutomationExercise Search product and verify cart after login", async ()=>{
+    const poManager = new POManager(page);
+    const BasePage = poManager.getBasePage();
+    const ProductsPage = poManager.getProductsPage();
+    const CartPage = poManager.getCartPage();
+    const LoginPage = poManager.getLoginPage();
+    await BasePage.goToProductsPage();
+    await ProductsPage.searchProductByWord("Jeans", 3);
+    const numberCards = await ProductsPage.addMultipleProductsToCart();
+    await BasePage.goToCart();
+    await CartPage.verifyProductsContainWord(numberCards ,"Jeans");
+    await expect(CartPage.cartRow).toHaveCount(3);
+    await BasePage.goToSignUpPage();
+    await LoginPage.userLogin(process.env.AUTOMATIONEXERCISE_email, process.env.AUTOMATIONEXERCISE_password);
+    await expect(BasePage.loggedAsLocator).toHaveText(/Logged in as \w+/);
+    await BasePage.goToCart();
+    await CartPage.verifyProductsContainWord(3, "Jeans");
+    await page.close();
+});
+
+test("@AutomationExercise Add review on product", async ()=>{
+    const poManager = new POManager(page);
+    const BasePage = poManager.getBasePage();
+    const ProductsPage = poManager.getProductsPage()
+    const ProductPage = poManager.getProductPage();
+    await BasePage.goToProductsPage();
+    await ProductsPage.viewProductInfo(1);
+    await ProductPage.fillReviewForm("John Doe", process.env.AUTOMATIONEXERCISE_email);
+    await expect(ProductPage.reviewSuccessMessage).toBeVisible();
+    page.close();
+});
+
+test("@AutomationExercise Add to cart from Recommended items", async ()=>{
+    const poManager = new POManager(page);
+    const BasePage = poManager.getBasePage();
+    const MainPage = poManager.getMainPage();
+    const CartPage = poManager.getCartPage()
+    await MainPage.addItemFromCarousel(1);
+    await BasePage.goToCart();
+    await expect(CartPage.cartRow).toHaveCount(1);
+    page.close();
+});
+
+test("@AutomationExercise Verify Scroll Up using 'Arrow' button and Scroll Down functionality", async ()=>{
+  const poManager = new POManager(page);
+    const MainPage = poManager.getMainPage();
+    await MainPage.scrollDownandScrollUpWithButton();
+    page.close();
+});
+
+test("@AutomationExercise Verify page scroll down and page scroll up", async ()=>{
+  const poManager = new POManager(page);
+    const MainPage = poManager.getMainPage();
+    await MainPage.scrollDownandScrollUpNoButton();
+    page.close();
+});
+
