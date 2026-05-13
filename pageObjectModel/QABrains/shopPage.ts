@@ -84,6 +84,7 @@ export class shopPage{
         await this.profileButton.click();
         await expect(this.favoritesPageAccess).toBeVisible();
         await this.favoritesPageAccess.click();
+        await this.page.waitForLoadState("networkidle");
         await  expect (this.favoritesTitlePage).toBeVisible();
     };
 

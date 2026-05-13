@@ -61,6 +61,7 @@ export class checkoutPage{
     };
     async completeCheckout(){
         await this.finishButton.click();
+        await this.page.waitForLoadState("networkidle");
     };
 
     async validatePriceOneProduct(productName){
@@ -77,6 +78,5 @@ export class checkoutPage{
         let priceTotal : number = Number ((await this.priceTotalLocator.textContent()!).replace("Total : $", "").trim());
         return {itemTotal, taxTotal, priceTotal};
     };
-
 
 };
