@@ -8,12 +8,12 @@ let page : Page;
 test.beforeEach(async({browser})=>{
     webContext = await browser.newContext();
     page = await webContext.newPage();
+    //intercept the cookies consent form and the google adds on the website and abort their display to get more consistent tests
+    await webContext.route('https://fundingchoicesmessages.google.com/**', route => route.abort());
+    await webContext.route('**/*google-analytics.com**', route =>route.abort());
+    await webContext.route('**/*googlesyndication.com**', route =>route.abort());
+    await webContext.route('**/*doubleclick.net**', route =>route.abort());
     await page.goto("https://www.automationexercise.com");
-    //intercept the google adds on the website and abort the display to get more consistent tests
-    await page.route('**/*.{google-analytics.com,googlesyndication.com,doubleclick.net}**', route => route.abort());
-    if (await page.getByRole("button", {name : "Manage options"}).isVisible()){
-        await page.getByRole("button", {name : "Manage options"}).click();
-        await page.getByRole("button", {name : "Confirm choices"}).click();}
     await expect(page.locator("#header")).toBeVisible();
     await expect(page.locator("#slider")).toBeVisible();
     await expect(page.locator("section").nth(1)).toBeVisible();
@@ -414,3 +414,12 @@ test("@AutomationExercise Verify page scroll down and page scroll up", async ()=
     page.close();
 });
 
+
+/*
+test('dossier', async({browser})=>{
+  playwright.use(StealthPlugin());
+
+  const browser = await playwright.chromium.launch();
+  const page = await browser.newPage();
+ & "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" ` --remote-debugging-port=9222 `
+  --user-data-dir="C:\chrome-debug-profile" */

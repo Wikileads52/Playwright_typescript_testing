@@ -255,5 +255,4 @@ export class productsPage {
     - paragraph: "Condition: New"
     - paragraph: "Brand: Polo"
     `
-
 };
